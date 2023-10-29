@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React from 'react'
+import {
+  RouterProvider,
+  Router,
+  Route,
+  RootRoute,
+} from '@tanstack/react-router'
+
+import Home from './components/pages/Home'
+import About from './components/pages/About'
+import Wrapper from './components/common/Wrapper'
+
 import './App.css'
 
-const App: React.FC = () => {
-  const [count, setCount] = useState(0)
+// Create a root route
+const rootRoute = new RootRoute({
+  component: Wrapper,
+})
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// Create an index route
+const indexRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: Home,
+})
+
+const aboutRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: '/about',
+  component: About,
+})
+
+// Create the route tree using your routes
+const routeTree = rootRoute.addChildren([indexRoute, aboutRoute])
+
+// Create the router using your route tree
+const router = new Router({ routeTree })
+
+// Register your router for maximum type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
 }
+
+const App: React.FC = () => <RouterProvider router={router} />
 
 export default App
